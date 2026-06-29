@@ -1,0 +1,50 @@
+
+> cafe-pos@0.0.0 dev
+> vite
+
+Port 5173 is in use, trying another one...
+
+  [32m[1mVITE[22m v8.1.0[39m  [2mready in [0m[1m302[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5174[22m/[39m
+[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
+[2m5:04:59 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mSchemaError[22m: KeyPath sortOrder on object store menuItems is not indexed
+[39m
+[2m5:04:59 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mSchemaError[22m: KeyPath sortOrder on object store menuItems is not indexed
+[39m
+[2m5:07:49 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mSchemaError[22m: KeyPath sortOrder on object store menuItems is not indexed
+[39m
+[2m5:07:49 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mSchemaError[22m: KeyPath sortOrder on object store menuItems is not indexed
+[39m
+[2m5:10:25 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m5:10:25 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m5:11:22 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mSchemaError[22m: KeyPath sortOrder on object store menuItems is not indexed
+[39m
+[2m5:11:35 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mSchemaError[22m: KeyPath sortOrder on object store menuItems is not indexed
+[39m
+[2m5:16:53 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/components/auth/LoginScreen.tsx, /src/components/cashier/CashierLayout.tsx, /src/components/admin/AdminLayout.tsx, /src/components/admin/AppSettings.tsx, /src/components/admin/OrderHistory.tsx, /src/components/admin/CustomerManager.tsx, /src/components/admin/DiscountManager.tsx, /src/components/admin/InventoryManager.tsx, /src/components/admin/ShiftManager.tsx, /src/components/admin/RecipeManager.tsx, /src/components/admin/ModifierManager.tsx and 21 more[22m
+[2m5:16:53 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m5:17:31 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mSchemaError[22m: KeyPath sortOrder on object store menuItems is not indexed
+[39m
+[2m5:17:31 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mSchemaError[22m: KeyPath sortOrder on object store menuItems is not indexed
+[39m
+[2m5:17:40 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mSchemaError[22m: KeyPath sortOrder on object store menuItems is not indexed
+[39m
+[2m5:17:54 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mSchemaError[22m: KeyPath sortOrder on object store menuItems is not indexed
+[39m
+[2m5:18:30 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mSchemaError[22m: KeyPath sortOrder on object store menuItems is not indexed
+[39m
+[2m5:18:30 AM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m [31m[Unhandled rejection] [1mSchemaError[22m: KeyPath sortOrder on object store menuItems is not indexed
+[39m
+[2m5:19:51 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m5:19:51 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m5:19:51 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m5:19:51 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m5:19:52 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m5:19:52 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m5:27:03 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/components/auth/LoginScreen.tsx, /src/components/admin/AdminLayout.tsx, /src/components/cashier/CashierLayout.tsx, /src/components/admin/AppSettings.tsx, /src/components/admin/OrderHistory.tsx, /src/components/admin/CustomerManager.tsx, /src/components/admin/DiscountManager.tsx, /src/components/admin/InventoryManager.tsx, /src/components/admin/Reports.tsx, /src/components/admin/ShiftManager.tsx, /src/components/admin/RecipeManager.tsx, /src/components/admin/Dashboard.tsx and 19 more[22m
+[2m5:27:04 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m5:27:44 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/components/auth/LoginScreen.tsx, /src/components/admin/AdminLayout.tsx, /src/components/cashier/CashierLayout.tsx, /src/components/admin/AppSettings.tsx, /src/components/admin/OrderHistory.tsx, /src/components/admin/CustomerManager.tsx, /src/components/admin/DiscountManager.tsx, /src/components/admin/InventoryManager.tsx, /src/components/admin/Reports.tsx, /src/components/admin/ShiftManager.tsx, /src/components/admin/RecipeManager.tsx, /src/components/admin/Dashboard.tsx and 19 more[22m
+[2m5:27:44 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m5:28:37 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/components/auth/LoginScreen.tsx, /src/components/admin/AdminLayout.tsx, /src/components/cashier/CashierLayout.tsx, /src/components/admin/AppSettings.tsx, /src/components/admin/OrderHistory.tsx, /src/components/admin/CustomerManager.tsx, /src/components/admin/DiscountManager.tsx, /src/components/admin/InventoryManager.tsx, /src/components/admin/Reports.tsx, /src/components/admin/ShiftManager.tsx, /src/components/admin/RecipeManager.tsx, /src/components/admin/Dashboard.tsx and 19 more[22m
+[2m5:28:37 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/index.css[22m
