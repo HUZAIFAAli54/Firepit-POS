@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Coffee, Shield, User, Delete, ChevronLeft } from 'lucide-react';
+import { Coffee, Shield, User, Delete, ChevronLeft, AlertTriangle, CheckCircle } from 'lucide-react';
 import { db, hashPin } from '../../db/database';
 import { useAppStore } from '../../store/useAppStore';
 import { logActivity } from '../../utils/logger';
@@ -13,6 +13,9 @@ export default function LoginScreen() {
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showForgotPin, setShowForgotPin] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [resetDone, setResetDone] = useState(false);
   const setSession = useAppStore(s => s.setSession);
   const cafeName = useAppStore(s => s.cafeName);
 
@@ -57,6 +60,24 @@ export default function LoginScreen() {
   useEffect(() => {
     if (pin.length >= 4) handleLogin();
   }, [pin]);
+
+  const handleResetPINs = async () => {
+    setResetting(true);
+    try {
+      const adminHash = await hashPin('1234');
+      const cashierHash = await hashPin('5678');
+      const allUsers = await db.users.toArray();
+      await Promise.all(allUsers.map(u => {
+        if (u.role === 'admin') return db.users.update(u.id!, { pin: adminHash });
+        if (u.role === 'cashier') return db.users.update(u.id!, { pin: cashierHash });
+        return Promise.resolve();
+      }));
+      await db.users.filter(u => u.active === true).toArray().then(setUsers);
+      setResetDone(true);
+    } finally {
+      setResetting(false);
+    }
+  };
 
   const digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 
@@ -176,6 +197,70 @@ export default function LoginScreen() {
           </button>
         </div>
       </div>
+
+      <button
+        onClick={() => { setShowForgotPin(true); setResetDone(false); }}
+        className="mt-4 text-xs text-gray-400 hover:text-amber-600 hover:underline underline-offset-2 transition-colors"
+      >
+        Forgot PIN?
+      </button>
+
+      {showForgotPin && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+            {resetDone ? (
+              <>
+                <div className="text-center mb-4">
+                  <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
+                  <h3 className="text-lg font-bold text-gray-800">PINs Reset Successfully</h3>
+                </div>
+                <div className="bg-green-50 rounded-xl p-4 text-sm text-green-800 space-y-1 mb-4">
+                  <p><strong>Admin PIN:</strong> 1234</p>
+                  <p><strong>Cashier PIN:</strong> 5678</p>
+                </div>
+                <button
+                  onClick={() => { setShowForgotPin(false); setPin(''); setError(''); }}
+                  className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-semibold"
+                >
+                  OK — Back to Login
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3 mb-3">
+                  <AlertTriangle className="w-6 h-6 text-amber-500 shrink-0" />
+                  <h3 className="text-lg font-bold text-gray-800">Reset PINs to Default</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-3">
+                  This will reset <strong>all</strong> account PINs to their factory defaults:
+                </p>
+                <div className="bg-amber-50 rounded-xl p-3 text-sm text-amber-800 space-y-1 mb-3">
+                  <p>All Admin accounts → PIN <strong>1234</strong></p>
+                  <p>All Cashier accounts → PIN <strong>5678</strong></p>
+                </div>
+                <p className="text-xs text-gray-400 mb-5">
+                  After logging in, each user can update their PIN from the portal.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowForgotPin(false)}
+                    className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleResetPINs}
+                    disabled={resetting}
+                    className="flex-1 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 disabled:bg-gray-200 disabled:text-gray-400 text-white font-bold"
+                  >
+                    {resetting ? 'Resetting…' : 'Reset PINs'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

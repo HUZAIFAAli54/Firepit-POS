@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Eye, EyeOff, Tag } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, EyeOff, Tag, X, Check } from 'lucide-react';
 import { db } from '../../db/database';
 import { useAppStore } from '../../store/useAppStore';
 import { logActivity } from '../../utils/logger';
@@ -23,6 +23,37 @@ export default function MenuManager() {
 
   const [catForm, setCatForm] = useState({ name: '', icon: '☕', color: '#d97706', sortOrder: 1, group: '' });
   const [itemForm, setItemForm] = useState({ name: '', description: '', price: '', cost: '', categoryId: 0 });
+
+  const [editMode, setEditMode] = useState(false);
+  const [editingRows, setEditingRows] = useState<Record<number, { name: string; price: string; categoryId: number; description: string; cost: string }>>({});
+  const [savingRow, setSavingRow] = useState<number | null>(null);
+
+  const getRowVal = (item: MenuItem) =>
+    editingRows[item.id!] ?? { name: item.name, price: String(item.price), categoryId: item.categoryId, description: item.description, cost: String(item.cost) };
+
+  const setRowField = (id: number, field: string, value: string | number, item: MenuItem) =>
+    setEditingRows(prev => ({ ...prev, [id]: { ...getRowVal(item), [field]: value } }));
+
+  const saveRow = async (item: MenuItem) => {
+    if (!session) return;
+    const row = getRowVal(item);
+    if (!row.name.trim()) return;
+    setSavingRow(item.id!);
+    try {
+      await db.menuItems.update(item.id!, {
+        name: row.name.trim(),
+        description: row.description,
+        price: parseFloat(row.price) || 0,
+        cost: parseFloat(row.cost) || 0,
+        categoryId: row.categoryId,
+      });
+      await logActivity(session.id, session.name, session.role, 'menu', 'Item Updated', row.name);
+      setEditingRows(prev => { const n = { ...prev }; delete n[item.id!]; return n; });
+      load();
+    } finally {
+      setSavingRow(null);
+    }
+  };
 
   const load = async () => {
     const cats = await db.categories.orderBy('sortOrder').toArray();
@@ -135,9 +166,23 @@ export default function MenuManager() {
     <div className="p-6 h-full flex flex-col">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Menu Management</h1>
-        <button onClick={() => openItemModal()} className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-medium">
-          <Plus className="w-4 h-4" /> Add Item
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => { setEditMode(m => !m); setEditingRows({}); }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all border ${
+              editMode
+                ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600'
+                : 'bg-white border-gray-200 text-gray-600 hover:border-blue-400 hover:text-blue-600'
+            }`}
+          >
+            {editMode
+              ? <><X className="w-4 h-4" /> Exit Edit Mode</>
+              : <><Edit className="w-4 h-4" /> Edit Items</>}
+          </button>
+          <button onClick={() => openItemModal()} className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-medium">
+            <Plus className="w-4 h-4" /> Add Item
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-6 flex-1 overflow-hidden">
@@ -194,9 +239,99 @@ export default function MenuManager() {
           </div>
         </div>
 
-        {/* Items Grid */}
+        {/* Items Area */}
         <div className="flex-1 overflow-y-auto scrollbar-thin">
-          {filteredItems.length === 0 ? (
+          {editMode ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-blue-50">
+                <Edit className="w-4 h-4 text-blue-500" />
+                <span className="text-sm font-semibold text-blue-700">Quick Edit Mode</span>
+                <span className="text-xs text-blue-400 ml-1">— Change fields, then click Save per row</span>
+                {Object.keys(editingRows).length > 0 && (
+                  <span className="ml-auto text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                    {Object.keys(editingRows).length} unsaved change{Object.keys(editingRows).length !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+              {filteredItems.length === 0 ? (
+                <div className="text-center py-12 text-gray-400 text-sm">No items in this category</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 border-b border-gray-100">
+                      <tr>
+                        <th className="px-3 py-2.5 text-left font-medium text-gray-400 w-8"></th>
+                        <th className="px-3 py-2.5 text-left font-medium text-gray-500">Name</th>
+                        <th className="px-3 py-2.5 text-left font-medium text-gray-500 w-32">Price ({currencySymbol})</th>
+                        <th className="px-3 py-2.5 text-left font-medium text-gray-500 w-44">Category</th>
+                        <th className="px-3 py-2.5 text-left font-medium text-gray-500 w-28">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {filteredItems.map(item => {
+                        const row = getRowVal(item);
+                        const isDirty = !!editingRows[item.id!];
+                        const cat = categories.find(c => c.id === item.categoryId);
+                        return (
+                          <tr key={item.id} className={`hover:bg-gray-50/60 transition-colors ${!item.available ? 'opacity-60' : ''}`}>
+                            <td className="px-3 py-2 text-center text-base">{cat?.icon || '🍽️'}</td>
+                            <td className="px-2 py-2">
+                              <input
+                                value={row.name}
+                                onChange={e => setRowField(item.id!, 'name', e.target.value, item)}
+                                className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
+                              />
+                            </td>
+                            <td className="px-2 py-2">
+                              <input
+                                type="number"
+                                min="0"
+                                value={row.price}
+                                onChange={e => setRowField(item.id!, 'price', e.target.value, item)}
+                                className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent"
+                              />
+                            </td>
+                            <td className="px-2 py-2">
+                              <select
+                                value={row.categoryId}
+                                onChange={e => setRowField(item.id!, 'categoryId', Number(e.target.value), item)}
+                                className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                              >
+                                {categories.map(c => (
+                                  <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                                ))}
+                              </select>
+                            </td>
+                            <td className="px-2 py-2">
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => saveRow(item)}
+                                  disabled={!isDirty || savingRow === item.id}
+                                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                    isDirty
+                                      ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                  }`}
+                                >
+                                  {savingRow === item.id ? '…' : <><Check className="w-3 h-3" /> Save</>}
+                                </button>
+                                <button
+                                  onClick={() => setDeleteTarget({ type: 'item', id: item.id! })}
+                                  className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-all"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          ) : filteredItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 text-gray-400">
               <Tag className="w-12 h-12 mb-3 opacity-30" />
               <p className="text-sm">No items in this category</p>
@@ -208,7 +343,6 @@ export default function MenuManager() {
                 const cat = categories.find(c => c.id === item.categoryId);
                 return (
                   <div key={item.id} className={`bg-white rounded-xl border shadow-sm overflow-hidden flex flex-col ${item.available ? 'border-gray-200' : 'border-red-200 opacity-80'}`}>
-                    {/* Item info */}
                     <div className="p-4 flex-1">
                       <div className="flex items-start gap-3 mb-2">
                         <span className="text-2xl shrink-0">{cat?.icon || '🍽️'}</span>
@@ -228,7 +362,6 @@ export default function MenuManager() {
                         </div>
                       </div>
                     </div>
-                    {/* Always-visible action bar */}
                     <div className="flex border-t border-gray-100 divide-x divide-gray-100">
                       <button onClick={() => toggleAvailable(item)}
                         className={`flex-1 py-2 text-xs font-semibold flex items-center justify-center gap-1 transition-all ${item.available ? 'text-gray-500 hover:bg-gray-50' : 'text-green-600 hover:bg-green-50'}`}>
